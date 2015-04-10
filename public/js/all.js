@@ -53,6 +53,66 @@ $('.category').click(function(e) {
 	
 });
 
+var _hash = {
+    init: SHA256_init,
+    update: SHA256_write,
+    getBytes: SHA256_finalize
+};
+
+function byteArrayToBigInteger(byteArray, startIndex) {
+    var value = new BigInteger("0", 10);
+    var temp1, temp2;
+    for (var i = byteArray.length - 1; i >= 0; i--) {
+      temp1 = value.multiply(new BigInteger("256", 10));
+      temp2 = temp1.add(new BigInteger(byteArray[i].toString(10), 10));
+      value = temp2;
+    }
+
+    return value;
+}
+
+function simpleHash(message) {
+    _hash.init();
+    _hash.update(message);
+    return _hash.getBytes();
+}
+
+
+function getPublicKey(secretPhrase) {
+    
+      var secretPhraseBytes = converters.stringToByteArray(secretPhrase);
+      var digest = simpleHash(secretPhraseBytes);
+      return curve25519.keygen(digest).p;
+}
+
+
+function getAccountIdFromPublicKey(publicKey, RSFormat) {
+    var hex = converters.hexStringToByteArray(publicKey);
+
+    _hash.init();
+    _hash.update(hex);
+
+    var account = _hash.getBytes();
+
+    account = converters.byteArrayToHexString(account);
+
+    var slice = (converters.hexStringToByteArray(account)).slice(0, 8);
+
+    var accountId = byteArrayToBigInteger(slice).toString();
+
+    if (RSFormat) {
+      var address = new NxtAddress();
+
+      if (address.set(accountId)) {
+        return address.toString();
+      } else {
+        return "";
+      }
+    } else {
+      return accountId;
+    }
+}
+
 
 $(document).ready(function() {
     console.log('all ready');
@@ -75,8 +135,14 @@ $(document).ready(function() {
 		$('#shapeShiftBTC').on('click', function() {
 		
 			bootbox.confirm("<form id='infos' action=''>\
+        Generate from Secret:<input type='password' id='password' /><button type='button' class='btn btn-default' id='shapeshift-generate-account'>Generate</button><br/>\
 				NXT Address:<input type='text' id='address' /><br/>\
 				Public Key:<input type='text' id='pubkey' />\
+        <script>$('#shapeshift-generate-account').on('click', function() {\
+          console.log($('#password').val());\
+          var public_key = converters.byteArrayToHexString(getPublicKey($('#password').val()));\
+          $('#pubkey').val(public_key);\
+          $('#address').val(getAccountIdFromPublicKey(public_key, true));});</script>\
 				</form>", function(result) {
 					if(result){
 						doshapeShiftBTC({accountRS: $('#infos').find('#address').val(), publicKey:  $('#infos').find('#pubkey').val()});

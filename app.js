@@ -4,13 +4,13 @@
 /**
  * Module dependencies.
  **/
-debug = false;
+debug = true;
 
 var nxtHost = "http://127.0.0.1";
 var nxtPort = 7876;
 var fmUrl = "http://127.0.0.1:17776/nxtpass";
 
-if(debug) nxtPort = 6876;
+if(debug) nxtPort = 7876;
 var nxtUrl = nxtHost + ":" + nxtPort + "/nxt";
 
 var express = require('express');
@@ -20,14 +20,14 @@ var path = require('path');
 var request = require('request');
 var fs = require('fs');
 
-var mongode = require('mongode');
-var db = mongode.connect("mongodb://127.0.0.1:27017/test");
+//var mongode = require('mongode');
+//var db = mongode.connect("mongodb://127.0.0.1:27017/test");
 
 var app = express();
 var httpApp = express();
 
-var rateUser = require('./routes/rateUser.js');
-var getRating = require('./routes/getRating.js');
+//var rateUser = require('./routes/rateUser.js');
+//var getRating = require('./routes/getRating.js');
 
 var bodyParser = require('body-parser')
 app.use(bodyParser.json()); // to support JSON-encoded bodies
@@ -88,7 +88,7 @@ console.log('Welcome to NxT FreeMarket Lite Browser!');
 /*
 * database
 **/
-var rating_db = db.collection("rating_db");
+//var rating_db = db.collection("rating_db");
 
 /**
  *Create Server and router
@@ -565,7 +565,7 @@ io.sockets.on('connection', function(socket) {
 	
 	
 	////////FMLite Reputation System
-
+/*
 	socket.on('rateSeller', function(seller){
 		console.log(JSON.stringify(seller));
 		/*
@@ -574,7 +574,7 @@ io.sockets.on('connection', function(socket) {
 							   item is actually sold already
 			2. check if rater actually bought this listing
 		*/
-
+/*
 	console.log(seller.address + seller.listing_id + seller.stars + seller.item_title + seller.secret);	
 		if(seller.feedback.length > 10 && seller.address != "" && seller.item_title != "" && seller.stars != "" && seller.secret != ""){
 			console.log('SELLER FEEDBACK LENGTH:' + seller.feedback.length);
@@ -673,7 +673,7 @@ io.sockets.on('connection', function(socket) {
 	}); //End getRatings
 	
 	//END FMLITE REPUTATION SYSTEM
-
+*/
 }); //io.sockets.on('connection')
 
 ////END SOCKET.IO
