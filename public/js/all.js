@@ -57,11 +57,39 @@ $('.category').click(function(e) {
 $(document).ready(function() {
     console.log('all ready');
 	
-	$('#testBtn').on('click', function() {
+	$('#createnxtaccount').on('click', function() {
 		
-		alert('clicked');
-		
+		bootbox.prompt ({
+			title: "Enter a password for your NXT account. All converted coins will be sent here. (Keep it safe!)",
+			inputType: "password",
+			callback: function(result) {
+				if (result.length <= 0)
+					bootbox.alert("Please Enter a valid Passphrase");
+				else
+					socket.emit('getWithdrawalNXTAddr', {secret: result});
+			}
+		}); //END get NXT Passphrase
+	
 	});
+
+		$('#shapeShiftBTC').on('click', function() {
+		
+			bootbox.confirm("<form id='infos' action=''>\
+				NXT Address:<input type='text' id='address' /><br/>\
+				Public Key:<input type='text' id='pubkey' />\
+				</form>", function(result) {
+					if(result){
+						doshapeShiftBTC({accountRS: $('#infos').find('#address').val(), publicKey:  $('#infos').find('#pubkey').val()});
+					}
+					else
+						bootbox.alert("Please Enter Valid Data");
+			});
+	
+	});
+	
+	
+	
+	
 	
 	$('table tbody').on('click', 'tr', function() {
 
